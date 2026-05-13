@@ -14,10 +14,10 @@ export default function PhaseStepper({ active, done }: PhaseStepperProps) {
         const isDone = i < done;
         const isActive = i === active;
         const stateClass = isActive
-          ? "bg-black text-white"
+          ? "bg-zinc-900 text-white"
           : isDone
             ? "bg-emerald-500 text-white"
-            : "bg-zinc-200 text-zinc-500";
+            : "bg-zinc-300 text-zinc-600";
         return (
           <li key={label} className="flex flex-1 items-center gap-1.5 sm:gap-2">
             <span
@@ -39,7 +39,7 @@ export default function PhaseStepper({ active, done }: PhaseStepperProps) {
             {i < STEPS.length - 1 && (
               <span
                 className={`h-px flex-1 ${
-                  isDone ? "bg-emerald-500" : "bg-zinc-200"
+                  isDone ? "bg-emerald-500" : "bg-zinc-300"
                 }`}
               />
             )}

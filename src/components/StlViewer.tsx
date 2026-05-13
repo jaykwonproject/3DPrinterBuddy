@@ -21,7 +21,7 @@ export default function StlViewer({ stl }: StlViewerProps) {
   }, [stl]);
 
   return (
-    <div className="h-64 w-full overflow-hidden rounded border border-zinc-200 bg-zinc-50 sm:h-80">
+    <div className="h-64 w-full overflow-hidden rounded-lg border border-zinc-200 bg-white sm:h-80">
       <Canvas camera={{ position: [80, 80, 80], fov: 35 }}>
         <ambientLight intensity={0.6} />
         <directionalLight position={[100, 100, 100]} intensity={0.8} />

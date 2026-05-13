@@ -153,7 +153,7 @@ export default function PhotoCapture({ onComplete }: PhotoCaptureProps) {
         <button
           type="button"
           onClick={handleStart}
-          className="min-h-11 self-start rounded bg-black px-5 py-2.5 text-sm font-medium text-white"
+          className="min-h-11 self-start rounded-lg bg-zinc-900 hover:bg-zinc-800 px-5 py-2.5 text-sm font-medium text-white"
         >
           Start camera
         </button>
@@ -161,7 +161,7 @@ export default function PhotoCapture({ onComplete }: PhotoCaptureProps) {
 
       {(mode.kind === "streaming" || mode.kind === "reviewing") && (
         <div className="flex flex-col gap-3">
-          <div className="relative overflow-hidden rounded border border-zinc-300 bg-black">
+          <div className="relative overflow-hidden rounded-lg border border-zinc-300 bg-black">
             <video
               ref={videoRef}
               playsInline
@@ -196,7 +196,7 @@ export default function PhotoCapture({ onComplete }: PhotoCaptureProps) {
             <button
               type="button"
               onClick={handleCapture}
-              className="min-h-11 self-stretch rounded bg-black px-5 py-2.5 text-sm font-medium text-white sm:self-start"
+              className="min-h-11 self-stretch rounded-lg bg-zinc-900 hover:bg-zinc-800 px-5 py-2.5 text-sm font-medium text-white sm:self-start"
             >
               Capture
             </button>
@@ -205,14 +205,14 @@ export default function PhotoCapture({ onComplete }: PhotoCaptureProps) {
               <button
                 type="button"
                 onClick={handleConfirm}
-                className="min-h-11 flex-1 rounded bg-black px-5 py-2.5 text-sm font-medium text-white sm:flex-none"
+                className="min-h-11 flex-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 px-5 py-2.5 text-sm font-medium text-white sm:flex-none"
               >
                 Confirm
               </button>
               <button
                 type="button"
                 onClick={handleRetake}
-                className="min-h-11 flex-1 rounded border border-zinc-300 px-5 py-2.5 text-sm font-medium sm:flex-none"
+                className="min-h-11 flex-1 rounded-lg border border-zinc-300 bg-white hover:bg-zinc-50 px-5 py-2.5 text-sm font-medium sm:flex-none"
               >
                 Retake
               </button>
@@ -240,14 +240,14 @@ export default function PhotoCapture({ onComplete }: PhotoCaptureProps) {
             <button
               type="button"
               onClick={handleUse}
-              className="min-h-11 flex-1 rounded bg-black px-5 py-2.5 text-sm font-medium text-white sm:flex-none"
+              className="min-h-11 flex-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 px-5 py-2.5 text-sm font-medium text-white sm:flex-none"
             >
               Use these photos
             </button>
             <button
               type="button"
               onClick={handleRestart}
-              className="min-h-11 flex-1 rounded border border-zinc-300 px-5 py-2.5 text-sm font-medium sm:flex-none"
+              className="min-h-11 flex-1 rounded-lg border border-zinc-300 bg-white hover:bg-zinc-50 px-5 py-2.5 text-sm font-medium sm:flex-none"
             >
               Start over
             </button>

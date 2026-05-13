@@ -90,7 +90,7 @@ const SketchPad = forwardRef<SketchPadHandle, SketchPadProps>(
           </div>
         </div>
         <div
-          className="h-72 overflow-hidden rounded border border-zinc-300 sm:h-100"
+          className="h-72 overflow-hidden rounded-lg border border-zinc-300 bg-white shadow-sm sm:h-100"
           style={{ touchAction: "none" }}
         >
           <ReactSketchCanvas
@@ -133,8 +133,8 @@ function ToolButton({
       disabled={disabled}
       className={
         active
-          ? "min-h-9 rounded bg-black px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
-          : "min-h-9 rounded border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 disabled:opacity-50"
+          ? "min-h-9 rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+          : "min-h-9 rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
       }
     >
       {children}

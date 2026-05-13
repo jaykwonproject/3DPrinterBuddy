@@ -38,6 +38,14 @@ const StlViewer = dynamic(() => import("@/components/StlViewer"), {
 
 const MAX_REPAIR_ATTEMPTS = 2;
 
+// Shared button styles. Use exactly one primary per screen. Secondary for the
+// expected alternative path. Tertiary for "escape hatch" actions like Start over.
+const BTN_BASE =
+  "inline-flex items-center justify-center gap-2 rounded-lg px-5 text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed";
+const BTN_PRIMARY = `${BTN_BASE} min-h-11 py-2.5 bg-zinc-900 text-white hover:bg-zinc-800 active:bg-zinc-700`;
+const BTN_SECONDARY = `${BTN_BASE} min-h-11 py-2.5 bg-white border border-zinc-300 text-zinc-800 hover:bg-zinc-50`;
+const BTN_TERTIARY = `${BTN_BASE} min-h-10 py-2 text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100`;
+
 type AppPhase =
   | { kind: "intro" }
   | { kind: "capture" }
@@ -268,37 +276,37 @@ export default function Home() {
       </header>
 
       {phase.kind !== "intro" && (
-        <div className="sticky top-0 z-10 -mx-4 bg-white/95 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6">
+        <div className="sticky top-0 z-10 -mx-4 border-b border-zinc-200 bg-zinc-50/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
           <PhaseStepper active={stepIndex} done={doneCount} />
         </div>
       )}
 
       {phase.kind === "intro" && (
-        <section className="flex flex-col gap-4 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:p-6">
-          <div className="flex flex-col gap-2">
+        <section className="flex flex-col gap-5 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+          <div className="flex flex-col gap-3">
             <p className="text-sm text-zinc-700">
               Capture a reference object, calibrate the scale, sketch what you
               want, and PrintBuddy generates a printable STL.
             </p>
-            <ul className="space-y-1 text-xs text-zinc-500">
+            <ol className="space-y-1 text-xs text-zinc-500">
               <li>① Capture 8 photos around the object</li>
               <li>② Calibrate scale by tapping two known points</li>
               <li>③ Sketch + describe what to make</li>
               <li>④ Get a sliceable STL</li>
-            </ul>
+            </ol>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
             <button
               type="button"
               onClick={startScanFlow}
-              className="min-h-11 flex-1 rounded bg-black px-5 py-2.5 text-sm font-medium text-white"
+              className={`${BTN_PRIMARY} flex-1`}
             >
               Start scanning
             </button>
             <button
               type="button"
               onClick={skipScanFlow}
-              className="min-h-11 flex-1 rounded border border-zinc-300 px-5 py-2.5 text-sm font-medium text-zinc-700"
+              className={`${BTN_SECONDARY} flex-1`}
             >
               Skip — text only
             </button>
@@ -374,25 +382,25 @@ export default function Home() {
             )}
           </div>
           <StlViewer stl={phase.stl} />
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
             <button
               type="button"
               onClick={handleDownload}
-              className="min-h-11 flex-1 rounded bg-black px-5 py-2.5 text-sm font-medium text-white sm:flex-none"
+              className={`${BTN_PRIMARY} sm:w-auto`}
             >
               Download STL
             </button>
             <button
               type="button"
               onClick={() => setPhase({ kind: "describe" })}
-              className="min-h-11 flex-1 rounded border border-zinc-300 px-5 py-2.5 text-sm font-medium sm:flex-none"
+              className={`${BTN_SECONDARY} sm:w-auto`}
             >
               Regenerate
             </button>
             <button
               type="button"
               onClick={reset}
-              className="min-h-11 flex-1 rounded border border-zinc-300 px-5 py-2.5 text-sm font-medium sm:flex-none"
+              className={`${BTN_TERTIARY} sm:w-auto`}
             >
               Start over
             </button>
@@ -401,12 +409,12 @@ export default function Home() {
       )}
 
       {phase.kind === "error" && (
-        <section className="rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-800">
+        <section className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-900">
           <p className="font-medium">Something went wrong</p>
           <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap wrap-break-word rounded bg-red-100/60 p-2 text-xs">
             {phase.message}
           </pre>
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
             <button
               type="button"
               onClick={() =>
@@ -414,14 +422,14 @@ export default function Home() {
                   kind: scannedPath && !calibrated ? "capture" : "describe",
                 })
               }
-              className="min-h-10 flex-1 rounded bg-black px-4 py-2 text-xs font-medium text-white sm:flex-none"
+              className={`${BTN_PRIMARY} sm:w-auto`}
             >
               Try again
             </button>
             <button
               type="button"
               onClick={reset}
-              className="min-h-10 flex-1 rounded border border-red-400 px-4 py-2 text-xs font-medium sm:flex-none"
+              className={`${BTN_TERTIARY} sm:w-auto`}
             >
               Start over
             </button>
@@ -497,7 +505,7 @@ function DescribePanel({
           value={form.description}
           onChange={(e) => update("description", e.target.value)}
           disabled={busy}
-          className="mt-1 h-24 w-full rounded border border-zinc-300 p-2 text-sm disabled:bg-zinc-100"
+          className="mt-1 h-24 w-full rounded-lg border border-zinc-300 bg-white p-2.5 text-sm shadow-sm focus:border-zinc-900 focus:outline-none disabled:bg-zinc-100"
         />
       </div>
 
@@ -513,7 +521,7 @@ function DescribePanel({
           value={form.notes}
           onChange={(e) => update("notes", e.target.value)}
           disabled={busy}
-          className="mt-1 w-full rounded border border-zinc-300 p-2 text-sm disabled:bg-zinc-100"
+          className="mt-1 w-full rounded-lg border border-zinc-300 bg-white p-2.5 text-sm shadow-sm focus:border-zinc-900 focus:outline-none disabled:bg-zinc-100"
         />
       </div>
 
@@ -521,7 +529,7 @@ function DescribePanel({
         type="button"
         onClick={onGenerate}
         disabled={busy}
-        className="inline-flex min-h-11 items-center justify-center gap-2 self-stretch rounded bg-black px-5 py-2.5 text-sm font-medium text-white disabled:opacity-60 sm:self-start"
+        className={`${BTN_PRIMARY} self-stretch sm:self-start`}
       >
         {busy && <Spinner size="sm" className="border-white/40 border-t-white" />}
         {busy ? "Working…" : "Generate STL"}
@@ -542,14 +550,14 @@ function NumberInput({
   disabled?: boolean;
 }) {
   return (
-    <label className="flex items-center rounded border border-zinc-300 px-2 text-sm focus-within:border-black has-disabled:bg-zinc-100">
+    <label className="flex items-center rounded-lg border border-zinc-300 bg-white px-3 text-sm shadow-sm focus-within:border-zinc-900 has-disabled:bg-zinc-100">
       <span className="mr-2 text-zinc-500">{label}</span>
       <input
         inputMode="decimal"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
-        className="w-full bg-transparent py-2 outline-none"
+        className="w-full bg-transparent py-2.5 outline-none"
       />
     </label>
   );
@@ -569,10 +577,10 @@ function StatusCard({
   // Reset the elapsed counter every time the phase kind changes.
   const elapsedSec = useElapsedSeconds(phaseKey);
   return (
-    <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm">
+    <div className="rounded-lg border border-zinc-200 bg-white p-4 text-sm shadow-sm">
       <div className="flex items-center gap-2.5">
         <Spinner size="md" />
-        <p className="font-medium text-zinc-800">{title}</p>
+        <p className="font-medium text-zinc-900">{title}</p>
       </div>
       <p className="mt-2 text-xs text-zinc-600">{body}</p>
       <p className="mt-2 font-mono text-[11px] text-zinc-400">
@@ -613,20 +621,20 @@ function ScadBlock({
       <button
         type="button"
         onClick={onToggle}
-        className="flex min-h-11 w-full items-center justify-between rounded border border-zinc-200 bg-zinc-50 px-3 py-2 text-left text-sm font-medium"
+        className="flex min-h-11 w-full items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-2 text-left text-sm font-medium text-zinc-800 hover:bg-zinc-50"
       >
         <span>Generated OpenSCAD ({scad.split("\n").length} lines)</span>
         <span className="text-zinc-500">{open ? "▾" : "▸"}</span>
       </button>
       {open && (
         <div className="mt-2 flex flex-col gap-2">
-          <pre className="max-h-72 overflow-auto rounded border border-zinc-200 bg-zinc-900 p-3 font-mono text-[11px] leading-relaxed text-zinc-100 sm:text-xs">
+          <pre className="max-h-72 overflow-auto rounded-lg border border-zinc-200 bg-zinc-900 p-3 font-mono text-[11px] leading-relaxed text-zinc-100 sm:text-xs">
             {scad}
           </pre>
           <button
             type="button"
             onClick={onCopy}
-            className="min-h-9 self-start rounded border border-zinc-300 px-3 py-1.5 text-xs"
+            className={`${BTN_TERTIARY} self-start`}
           >
             {copied ? "Copied!" : "Copy SCAD"}
           </button>

@@ -119,7 +119,7 @@ export default function MeshViewer({ glb, onCalibrated }: MeshViewerProps) {
 
   return (
     <div className="relative">
-      <div className="h-72 w-full overflow-hidden rounded border border-zinc-200 bg-zinc-50 sm:h-96">
+      <div className="h-72 w-full overflow-hidden rounded-lg border border-zinc-200 bg-white sm:h-96">
         {loadError ? (
           <div className="flex h-full items-center justify-center p-4 text-sm text-red-700">
             {loadError}
@@ -158,7 +158,7 @@ export default function MeshViewer({ glb, onCalibrated }: MeshViewerProps) {
             <button
               type="button"
               onClick={recalibrate}
-              className="rounded border border-zinc-300 bg-white px-2 py-0.5 text-xs"
+              className="rounded-md border border-zinc-300 bg-white px-2.5 py-1 text-xs hover:bg-zinc-50"
             >
               Recalibrate
             </button>
@@ -270,21 +270,21 @@ function DistanceModal({
           onKeyDown={(e) => {
             if (e.key === "Enter") onSubmit();
           }}
-          className="mt-3 w-full rounded border border-zinc-300 p-2 text-sm"
+          className="mt-3 w-full rounded-lg border border-zinc-300 p-2.5 text-sm shadow-sm focus:border-zinc-900 focus:outline-none"
           autoFocus
         />
         <div className="mt-3 flex justify-end gap-2">
           <button
             type="button"
             onClick={onCancel}
-            className="rounded border border-zinc-300 px-3 py-1 text-xs"
+            className="min-h-9 rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs hover:bg-zinc-50"
           >
             Restart
           </button>
           <button
             type="button"
             onClick={onSubmit}
-            className="rounded bg-black px-3 py-1 text-xs font-medium text-white"
+            className="min-h-9 rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800"
           >
             Apply
           </button>
