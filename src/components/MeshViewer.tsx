@@ -119,13 +119,18 @@ export default function MeshViewer({ glb, onCalibrated }: MeshViewerProps) {
 
   return (
     <div className="relative">
-      <div className="h-96 w-full overflow-hidden rounded border border-zinc-200 bg-zinc-50">
+      <div className="h-72 w-full overflow-hidden rounded border border-zinc-200 bg-zinc-50 sm:h-96">
         {loadError ? (
           <div className="flex h-full items-center justify-center p-4 text-sm text-red-700">
             {loadError}
           </div>
         ) : !scene ? (
-          <div className="flex h-full items-center justify-center text-sm text-zinc-500">
+          <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-zinc-500">
+            <span
+              role="status"
+              aria-label="Loading"
+              className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600"
+            />
             Loading mesh…
           </div>
         ) : (

@@ -66,11 +66,11 @@ const SketchPad = forwardRef<SketchPadHandle, SketchPadProps>(
 
     return (
       <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <label className="text-sm font-medium text-zinc-700">
             Sketch (optional)
           </label>
-          <div className="flex gap-1">
+          <div className="flex flex-wrap gap-1">
             <ToolButton active={tool === "pen"} onClick={selectPen} disabled={disabled}>
               Pen
             </ToolButton>
@@ -85,18 +85,18 @@ const SketchPad = forwardRef<SketchPadHandle, SketchPadProps>(
               Undo
             </ToolButton>
             <ToolButton onClick={clearSketch} disabled={disabled || !hasStrokes}>
-              Skip / Clear
+              Clear
             </ToolButton>
           </div>
         </div>
         <div
-          className="overflow-hidden rounded border border-zinc-300"
+          className="h-72 overflow-hidden rounded border border-zinc-300 sm:h-100"
           style={{ touchAction: "none" }}
         >
           <ReactSketchCanvas
             ref={canvasRef}
             width="100%"
-            height="400px"
+            height="100%"
             strokeColor="#000000"
             strokeWidth={SKETCH_STROKE}
             eraserWidth={ERASER_STROKE}
@@ -133,8 +133,8 @@ function ToolButton({
       disabled={disabled}
       className={
         active
-          ? "rounded bg-black px-2 py-1 text-xs font-medium text-white disabled:opacity-50"
-          : "rounded border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-700 disabled:opacity-50"
+          ? "min-h-9 rounded bg-black px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+          : "min-h-9 rounded border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 disabled:opacity-50"
       }
     >
       {children}

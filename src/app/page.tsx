@@ -1,11 +1,12 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { compileScadToStl, downloadStl } from "@/lib/openscad";
 import type { SketchPadHandle } from "@/components/SketchPad";
 import type { MeshDimensions } from "@/components/MeshViewer";
 import PhaseStepper from "@/components/PhaseStepper";
+import Spinner from "@/components/Spinner";
 
 const PhotoCapture = dynamic(() => import("@/components/PhotoCapture"), {
   ssr: false,
@@ -256,38 +257,50 @@ export default function Home() {
   const scad = currentScad(phase);
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-6">
-      <header>
-        <h1 className="text-3xl font-semibold tracking-tight">PrintBuddy</h1>
-        <p className="text-sm text-zinc-500">
+    <main className="mx-auto flex w-full max-w-2xl flex-col gap-4 p-4 sm:gap-6 sm:p-6">
+      <header className="flex flex-col gap-0.5">
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          PrintBuddy
+        </h1>
+        <p className="text-xs text-zinc-500 sm:text-sm">
           Scan, sketch, describe — get a printable STL.
         </p>
       </header>
 
       {phase.kind !== "intro" && (
-        <PhaseStepper active={stepIndex} done={doneCount} />
+        <div className="sticky top-0 z-10 -mx-4 bg-white/95 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6">
+          <PhaseStepper active={stepIndex} done={doneCount} />
+        </div>
       )}
 
       {phase.kind === "intro" && (
-        <section className="flex flex-col gap-3 rounded border border-zinc-200 p-4">
-          <p className="text-sm text-zinc-700">
-            Capture a reference object, calibrate the scale, sketch what you
-            want, and PrintBuddy will generate a printable STL.
-          </p>
-          <div className="flex flex-wrap gap-2">
+        <section className="flex flex-col gap-4 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:p-6">
+          <div className="flex flex-col gap-2">
+            <p className="text-sm text-zinc-700">
+              Capture a reference object, calibrate the scale, sketch what you
+              want, and PrintBuddy generates a printable STL.
+            </p>
+            <ul className="space-y-1 text-xs text-zinc-500">
+              <li>① Capture 8 photos around the object</li>
+              <li>② Calibrate scale by tapping two known points</li>
+              <li>③ Sketch + describe what to make</li>
+              <li>④ Get a sliceable STL</li>
+            </ul>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row">
             <button
               type="button"
               onClick={startScanFlow}
-              className="rounded bg-black px-4 py-2 text-sm font-medium text-white"
+              className="min-h-11 flex-1 rounded bg-black px-5 py-2.5 text-sm font-medium text-white"
             >
               Start scanning
             </button>
             <button
               type="button"
               onClick={skipScanFlow}
-              className="rounded border border-zinc-300 px-4 py-2 text-sm font-medium"
+              className="min-h-11 flex-1 rounded border border-zinc-300 px-5 py-2.5 text-sm font-medium text-zinc-700"
             >
-              Skip scanning (text only)
+              Skip — text only
             </button>
           </div>
         </section>
@@ -299,8 +312,10 @@ export default function Home() {
 
       {phase.kind === "processing" && (
         <StatusCard
-          title="Reconstructing your object…"
-          body="Sending the front-facing photo to Hunyuan3D-2. First call can queue for a minute or two on free-tier GPU."
+          title="Reconstructing your object"
+          body="Sending your photo to Hunyuan3D-2. First request can queue for a minute on free-tier GPU."
+          etaText="~30–120s typical"
+          phaseKey="processing"
         />
       )}
 
@@ -331,6 +346,8 @@ export default function Home() {
         <StatusCard
           title={statusTitle(phase)}
           body={statusBody(phase)}
+          etaText={statusEta(phase)}
+          phaseKey={phase.kind}
         />
       )}
 
@@ -346,31 +363,36 @@ export default function Home() {
 
       {phase.kind === "ready" && (
         <section className="flex flex-col gap-3">
-          {phase.repaired && (
-            <p className="text-xs text-amber-700">
-              Generated SCAD failed on first compile — auto-repair recovered it.
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
+            <p className="font-medium">
+              STL ready · {phase.stl.byteLength.toLocaleString()} bytes
             </p>
-          )}
+            {phase.repaired && (
+              <p className="mt-1 text-xs text-emerald-700">
+                Auto-repair recovered an initial compile failure.
+              </p>
+            )}
+          </div>
           <StlViewer stl={phase.stl} />
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             <button
               type="button"
               onClick={handleDownload}
-              className="rounded bg-black px-4 py-2 text-sm font-medium text-white"
+              className="min-h-11 flex-1 rounded bg-black px-5 py-2.5 text-sm font-medium text-white sm:flex-none"
             >
               Download STL
             </button>
             <button
               type="button"
               onClick={() => setPhase({ kind: "describe" })}
-              className="rounded border border-zinc-300 px-4 py-2 text-sm font-medium"
+              className="min-h-11 flex-1 rounded border border-zinc-300 px-5 py-2.5 text-sm font-medium sm:flex-none"
             >
               Regenerate
             </button>
             <button
               type="button"
               onClick={reset}
-              className="rounded border border-zinc-300 px-4 py-2 text-sm font-medium"
+              className="min-h-11 flex-1 rounded border border-zinc-300 px-5 py-2.5 text-sm font-medium sm:flex-none"
             >
               Start over
             </button>
@@ -379,10 +401,12 @@ export default function Home() {
       )}
 
       {phase.kind === "error" && (
-        <section className="rounded border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+        <section className="rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-800">
           <p className="font-medium">Something went wrong</p>
-          <pre className="mt-2 whitespace-pre-wrap text-xs">{phase.message}</pre>
-          <div className="mt-3 flex gap-2">
+          <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap wrap-break-word rounded bg-red-100/60 p-2 text-xs">
+            {phase.message}
+          </pre>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
             <button
               type="button"
               onClick={() =>
@@ -390,14 +414,14 @@ export default function Home() {
                   kind: scannedPath && !calibrated ? "capture" : "describe",
                 })
               }
-              className="rounded bg-black px-3 py-1 text-xs font-medium text-white"
+              className="min-h-10 flex-1 rounded bg-black px-4 py-2 text-xs font-medium text-white sm:flex-none"
             >
               Try again
             </button>
             <button
               type="button"
               onClick={reset}
-              className="rounded border border-zinc-400 px-3 py-1 text-xs font-medium"
+              className="min-h-10 flex-1 rounded border border-red-400 px-4 py-2 text-xs font-medium sm:flex-none"
             >
               Start over
             </button>
@@ -497,9 +521,10 @@ function DescribePanel({
         type="button"
         onClick={onGenerate}
         disabled={busy}
-        className="self-start rounded bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+        className="inline-flex min-h-11 items-center justify-center gap-2 self-stretch rounded bg-black px-5 py-2.5 text-sm font-medium text-white disabled:opacity-60 sm:self-start"
       >
-        Generate STL
+        {busy && <Spinner size="sm" className="border-white/40 border-t-white" />}
+        {busy ? "Working…" : "Generate STL"}
       </button>
     </section>
   );
@@ -530,13 +555,44 @@ function NumberInput({
   );
 }
 
-function StatusCard({ title, body }: { title: string; body: string }) {
+function StatusCard({
+  title,
+  body,
+  etaText,
+  phaseKey,
+}: {
+  title: string;
+  body: string;
+  etaText?: string;
+  phaseKey: string;
+}) {
+  // Reset the elapsed counter every time the phase kind changes.
+  const elapsedSec = useElapsedSeconds(phaseKey);
   return (
-    <div className="rounded border border-zinc-200 bg-zinc-50 p-3 text-sm">
-      <p className="font-medium text-zinc-800">{title}</p>
-      <p className="mt-1 text-xs text-zinc-600">{body}</p>
+    <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm">
+      <div className="flex items-center gap-2.5">
+        <Spinner size="md" />
+        <p className="font-medium text-zinc-800">{title}</p>
+      </div>
+      <p className="mt-2 text-xs text-zinc-600">{body}</p>
+      <p className="mt-2 font-mono text-[11px] text-zinc-400">
+        elapsed {elapsedSec}s{etaText ? ` · ${etaText}` : ""}
+      </p>
     </div>
   );
+}
+
+function useElapsedSeconds(key: string): number {
+  const [seconds, setSeconds] = useState(0);
+  useEffect(() => {
+    setSeconds(0);
+    const t0 = performance.now();
+    const id = window.setInterval(() => {
+      setSeconds(Math.floor((performance.now() - t0) / 1000));
+    }, 500);
+    return () => window.clearInterval(id);
+  }, [key]);
+  return seconds;
 }
 
 function ScadBlock({
@@ -557,20 +613,20 @@ function ScadBlock({
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center justify-between rounded border border-zinc-200 bg-zinc-50 px-3 py-2 text-left text-sm font-medium"
+        className="flex min-h-11 w-full items-center justify-between rounded border border-zinc-200 bg-zinc-50 px-3 py-2 text-left text-sm font-medium"
       >
         <span>Generated OpenSCAD ({scad.split("\n").length} lines)</span>
         <span className="text-zinc-500">{open ? "▾" : "▸"}</span>
       </button>
       {open && (
         <div className="mt-2 flex flex-col gap-2">
-          <pre className="max-h-80 overflow-auto rounded border border-zinc-200 bg-zinc-900 p-3 font-mono text-xs text-zinc-100">
+          <pre className="max-h-72 overflow-auto rounded border border-zinc-200 bg-zinc-900 p-3 font-mono text-[11px] leading-relaxed text-zinc-100 sm:text-xs">
             {scad}
           </pre>
           <button
             type="button"
             onClick={onCopy}
-            className="self-start rounded border border-zinc-300 px-3 py-1 text-xs"
+            className="min-h-9 self-start rounded border border-zinc-300 px-3 py-1.5 text-xs"
           >
             {copied ? "Copied!" : "Copy SCAD"}
           </button>
@@ -603,6 +659,19 @@ function statusBody(phase: AppPhase): string {
       return "openscad-wasm is running in your browser. First run loads ~14 MB of WASM.";
     case "repairing":
       return "Last compile failed — feeding the error back to Gemini for a fix.";
+    default:
+      return "";
+  }
+}
+
+function statusEta(phase: AppPhase): string {
+  switch (phase.kind) {
+    case "generating":
+      return "~30–90s typical";
+    case "compiling":
+      return "~5–60s typical";
+    case "repairing":
+      return "~30–60s typical";
     default:
       return "";
   }

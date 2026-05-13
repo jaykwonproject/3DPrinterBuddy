@@ -153,7 +153,7 @@ export default function PhotoCapture({ onComplete }: PhotoCaptureProps) {
         <button
           type="button"
           onClick={handleStart}
-          className="self-start rounded bg-black px-4 py-2 text-sm font-medium text-white"
+          className="min-h-11 self-start rounded bg-black px-5 py-2.5 text-sm font-medium text-white"
         >
           Start camera
         </button>
@@ -196,7 +196,7 @@ export default function PhotoCapture({ onComplete }: PhotoCaptureProps) {
             <button
               type="button"
               onClick={handleCapture}
-              className="self-start rounded bg-black px-4 py-2 text-sm font-medium text-white"
+              className="min-h-11 self-stretch rounded bg-black px-5 py-2.5 text-sm font-medium text-white sm:self-start"
             >
               Capture
             </button>
@@ -205,14 +205,14 @@ export default function PhotoCapture({ onComplete }: PhotoCaptureProps) {
               <button
                 type="button"
                 onClick={handleConfirm}
-                className="rounded bg-black px-4 py-2 text-sm font-medium text-white"
+                className="min-h-11 flex-1 rounded bg-black px-5 py-2.5 text-sm font-medium text-white sm:flex-none"
               >
                 Confirm
               </button>
               <button
                 type="button"
                 onClick={handleRetake}
-                className="rounded border border-zinc-300 px-4 py-2 text-sm font-medium"
+                className="min-h-11 flex-1 rounded border border-zinc-300 px-5 py-2.5 text-sm font-medium sm:flex-none"
               >
                 Retake
               </button>
@@ -236,18 +236,18 @@ export default function PhotoCapture({ onComplete }: PhotoCaptureProps) {
               />
             ))}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <button
               type="button"
               onClick={handleUse}
-              className="rounded bg-black px-4 py-2 text-sm font-medium text-white"
+              className="min-h-11 flex-1 rounded bg-black px-5 py-2.5 text-sm font-medium text-white sm:flex-none"
             >
               Use these photos
             </button>
             <button
               type="button"
               onClick={handleRestart}
-              className="rounded border border-zinc-300 px-4 py-2 text-sm font-medium"
+              className="min-h-11 flex-1 rounded border border-zinc-300 px-5 py-2.5 text-sm font-medium sm:flex-none"
             >
               Start over
             </button>
