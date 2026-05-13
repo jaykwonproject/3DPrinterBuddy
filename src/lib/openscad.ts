@@ -57,13 +57,16 @@ export async function compileScadToStl(code: string): Promise<CompileResult> {
 
   FS.writeFile("/input.scad", code);
   let exitCode = 0;
+  let trapMessage: string | null = null;
   try {
     exitCode = module.callMain(["/input.scad", "-o", "/output.stl"]);
   } catch (err) {
-    // OpenSCAD exits the runtime via an exception in some builds.
+    // OpenSCAD exits the runtime via an exception in some builds. ExitStatus is
+    // routine; anything else is a wasm trap (OOM, CGAL assertion, etc.) where
+    // the message is usually an opaque pointer.
     const message = err instanceof Error ? err.message : String(err);
     if (!/^ExitStatus|Exit/i.test(message)) {
-      throw new Error(buildErrorMessage(message, stderrBuffer));
+      trapMessage = message;
     }
   } finally {
     try {
@@ -81,7 +84,7 @@ export async function compileScadToStl(code: string): Promise<CompileResult> {
   } catch {
     throw new Error(
       buildErrorMessage(
-        `OpenSCAD produced no output (exit ${exitCode})`,
+        translateCompileFailure(trapMessage, exitCode, stderrBuffer),
         stderrBuffer,
       ),
     );
@@ -96,7 +99,7 @@ export async function compileScadToStl(code: string): Promise<CompileResult> {
   if (stl.byteLength === 0) {
     throw new Error(
       buildErrorMessage(
-        "OpenSCAD produced an empty STL (non-manifold or empty geometry)",
+        "OpenSCAD produced an empty STL (non-manifold or empty geometry).",
         stderrBuffer,
       ),
     );
@@ -112,6 +115,25 @@ export async function compileScadToStl(code: string): Promise<CompileResult> {
 function buildErrorMessage(headline: string, stderrBuffer: string[]): string {
   const stderr = stderrBuffer.join("\n").trim();
   return stderr ? `${headline}\n${stderr}` : headline;
+}
+
+function translateCompileFailure(
+  trapMessage: string | null,
+  exitCode: number,
+  stderrBuffer: string[],
+): string {
+  const stderr = stderrBuffer.join("\n");
+  // OpenSCAD's structured parser/eval errors land in stderr and are useful to
+  // pass straight back into the repair flow.
+  if (/^(ERROR|WARNING):/m.test(stderr)) {
+    return `OpenSCAD reported errors (exit ${exitCode}).`;
+  }
+  // No structured error but the wasm runtime trapped — almost always a CGAL
+  // assertion (degenerate manifold) or out-of-memory in the in-browser kernel.
+  if (trapMessage || exitCode !== 0) {
+    return "Geometry is too complex or non-manifold for the in-browser compiler. Typical causes: hull() over many primitives, minkowski(), or difference() with cuts that share faces. Try simpler primitives or describe a less detailed part.";
+  }
+  return `OpenSCAD produced no output (exit ${exitCode}).`;
 }
 
 export function downloadStl(data: Uint8Array, filename: string): void {
